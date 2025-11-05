@@ -1,0 +1,11 @@
+# Ignore compiled Go binaries
+/load-balancer/load-balancer
+/load-balancer/load-balancer.exe
+
+# Ignore test-backend binaries
+/test-environment/backend-app/backend-app
+/test-environment/backend-app/backend-app.exe
+
+# Ignore Mac and Windows system files
+.DS_Store
+Thumbs.db

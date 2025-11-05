@@ -1,0 +1,24 @@
+services:
+  # Server 1
+  backend-1:
+    build: ./backend-app # Path to your backend app's Dockerfile
+    ports:
+      - "9001:8000" # Maps host 9001 to container 8000
+    environment:
+      - SERVER_ID=Server-1
+
+  # Server 2
+  backend-2:
+    build: ./backend-app
+    ports:
+      - "9002:8000"
+    environment:
+      - SERVER_ID=Server-2
+
+  # Server 3
+  backend-3:
+    build: ./backend-app
+    ports:
+      - "9003:8000"
+    environment:
+      - SERVER_ID=Server-3
