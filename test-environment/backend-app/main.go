@@ -17,6 +17,7 @@ func main() {
 		// Just write a 200 OK status
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprintf(w, "OK")
+		log.Printf("[%s] Health check request: %s %s", os.Getenv("SERVER_ID"), r.Method, r.URL.Path)
 	})
 
 	http.ListenAndServe(":8000", nil)

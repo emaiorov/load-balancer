@@ -1,0 +1,25 @@
+{
+    "app": {
+        "algorythm": "RoundRobin",
+        "port": "8080",
+        "health_check_seconds": 5
+    },
+    "servers": [
+        {
+            "url": "http://localhost:9001",
+            "health": "/health"
+        },
+        {
+            "url": "http://localhost:9002",
+            "health": "/health"
+        },
+        {
+            "url": "http://localhost:9003",
+            "health": "/health"
+        },
+        {
+            "url": "http://localhost:9004",
+            "health": "/health"
+        }
+    ]
+}
