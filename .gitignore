@@ -1,6 +1,7 @@
 # Ignore compiled Go binaries
 /load-balancer/load-balancer
 /load-balancer/load-balancer.exe
+/load-balancer/config.json
 
 # Ignore test-backend binaries
 /test-environment/backend-app/backend-app
