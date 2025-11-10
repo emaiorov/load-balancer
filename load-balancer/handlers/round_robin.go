@@ -6,29 +6,22 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"time"
 )
 
 type RoundRobinHandler struct {
 	Handler
 }
 
-type Counter struct {
-	index  int
-	length int
-}
-
-func (c *Counter) Next() {
-	c.index++
-	if c.index >= c.length {
-		c.index = 0
-	}
-}
-
 func NewRoundRobinHandler(servers []Server) *RoundRobinHandler {
+	serversPtrs := make([]*Server, len(servers))
+
+	for i := range servers {
+		serversPtrs[i] = &servers[i]
+	}
+
 	return &RoundRobinHandler{
 		Handler: Handler{
-			Servers: servers,
+			Servers: serversPtrs,
 		},
 	}
 }
@@ -38,18 +31,17 @@ func (h *RoundRobinHandler) GetUrl() (string, error) {
 	defer h.mu.Unlock()
 
 	serverCounter := len(h.Servers)
-
+	counter := h.GetCounter()
 	for range serverCounter {
-		counter := &h.Counter
-		server := &h.Servers[counter.index]
-
+		server := h.Servers[counter.index]
 		if server.IsAlive {
 			url := server.Url
-			h.Counter.Next()
+			if server.Counter.NextAndWrap() {
+				counter.Next()
+			}
 			return url, nil
 		}
-
-		h.Counter.Next()
+		counter.Next()
 	}
 
 	return "", fmt.Errorf("no active destinations")
@@ -69,32 +61,6 @@ func (handler *RoundRobinHandler) ServeHTTP(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	proxy := httputil.NewSingleHostReverseProxy(targetUrl)
 	proxy.ServeHTTP(w, r)
-}
-
-func healthCheck(h *RoundRobinHandler, duration int) {
-	sleepTime := time.Duration(duration) * time.Second
-
-	for {
-		i := 0
-		count := len(h.Servers)
-		for i < count {
-			resp, err := http.Get(h.Servers[i].GetHealthUrl())
-			if err != nil {
-				fmt.Printf("health check error: %v", err)
-			}
-			isAlive := (err == nil && resp.Status == "200 OK")
-			h.mu.Lock()
-			h.Servers[i].IsAlive = isAlive
-			h.mu.Unlock()
-			if !isAlive {
-				fmt.Printf("server %d is down\n", i)
-			}
-			i++
-		}
-
-		time.Sleep(sleepTime)
-	}
 }

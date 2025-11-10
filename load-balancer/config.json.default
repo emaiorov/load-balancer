@@ -1,25 +1,31 @@
 {
     "app": {
+        //Choose one algorythm
         "algorythm": "RoundRobin",
+        "algorythm": "LeastConnections",
         "port": "8080",
         "health_check_seconds": 5
     },
     "servers": [
         {
             "url": "http://localhost:9001",
-            "health": "/health"
+            "health": "/health",
+            "weight": 1
         },
         {
             "url": "http://localhost:9002",
-            "health": "/health"
+            "health": "/health",
+            "weight": 1
         },
         {
             "url": "http://localhost:9003",
-            "health": "/health"
+            "health": "/health",
+            "weight": 1
         },
         {
             "url": "http://localhost:9004",
-            "health": "/health"
+            "health": "/health",
+            "weight": 1
         }
     ]
 }

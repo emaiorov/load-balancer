@@ -9,6 +9,7 @@ import (
 type ServerConfig struct {
 	Url    string `json:"url"`
 	Health string `json:"health"`
+	Weight uint   `json:"weight"`
 }
 
 type Config struct {
