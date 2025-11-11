@@ -19,6 +19,6 @@ services:
   backend-3:
     build: ./backend-app
     ports:
-      - "9003:8000"
+      - "9004:8000"
     environment:
       - SERVER_ID=Server-3
