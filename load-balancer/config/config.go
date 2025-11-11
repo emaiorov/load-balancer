@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"os"
 )
 
@@ -21,18 +21,18 @@ type Config struct {
 	Servers []ServerConfig `json:"servers"`
 }
 
-func Load() *Config {
+func Load(path string) (*Config, error) {
 
 	var config Config
-	jsonFile, err := os.ReadFile("config.json")
+	jsonFile, err := os.ReadFile(path)
 	if err != nil {
-		log.Fatalf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file'%s': %w", path, err)
 	}
 
 	err = json.Unmarshal(jsonFile, &config)
 	if err != nil {
-		log.Fatalf("Error parsing JSON: %v", err)
+		return nil, fmt.Errorf("error parsing JSON from '%s': %w", path, err)
 	}
 
-	return &config
+	return &config, nil
 }

@@ -29,9 +29,9 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		serverID = "Unknown server"
 	}
 
-	log.Printf("[%s] Received request: %s %s", serverID, r.Method, r.URL.Path)
+	//log.Printf("[%s] Received request: %s %s", serverID, r.Method, r.URL.Path)
 
-	sleepTime := time.Duration(rand.Intn(100)+20) * time.Millisecond
+	sleepTime := time.Duration(rand.Intn(1000)+200) * time.Millisecond
 	time.Sleep(sleepTime)
 
 	w.Header().Set("Content-Type", "application/json")

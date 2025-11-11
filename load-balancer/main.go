@@ -10,7 +10,11 @@ import (
 func main() {
 
 	var servers []handlers.Server
-	appConfig := config.Load()
+	appConfig, err := config.Load("config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for _, serverConfig := range appConfig.Servers {
 		var counter handlers.Counter
 		counter.SetLenth(int(serverConfig.Weight))
