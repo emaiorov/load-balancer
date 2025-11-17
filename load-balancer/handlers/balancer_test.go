@@ -238,4 +238,88 @@ func TestLoad(t *testing.T) {
 			}
 		})
 	}
+
+	testCasesCounter := []int{1, 5, 0, 50000000}
+	for _, tc := range testCasesCounter {
+		t.Run("SetLenth", func(t *testing.T) {
+			counter := Counter{0, 0}
+			counter.SetLenth(tc)
+
+			if counter.length != tc {
+				t.Errorf("Unexpected counter length: %d expected length: %d", counter.length, tc)
+			}
+		})
+	}
+
+	testCasesNextCounter := []int{3, 5, 7, 50000000}
+	for _, tc := range testCasesNextCounter {
+		t.Run("NextCounter", func(t *testing.T) {
+			counter := Counter{0, 0}
+			counter.SetLenth(tc)
+			counter.Next()
+			if counter.index != 1 {
+				t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, tc)
+			}
+
+			counter.Next()
+			if counter.index != 2 {
+				t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, tc)
+			}
+		})
+	}
+
+	t.Run("NextCounterEdgeCases", func(t *testing.T) {
+		counter := Counter{0, 0}
+		counter.SetLenth(0)
+		counter.Next()
+		if counter.index != 0 {
+			t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, 0)
+		}
+
+		counter.Next()
+		if counter.index != 0 {
+			t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, 0)
+		}
+
+		counter.SetLenth(1)
+		counter.Next()
+		if counter.index != 0 {
+			t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, 0)
+		}
+
+		counter.SetLenth(2)
+		counter.Next()
+		if counter.index != 1 {
+			t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, 1)
+		}
+	})
+
+	t.Run("NextAndWrapCounter", func(t *testing.T) {
+		counter := Counter{0, 0}
+		counter.SetLenth(2)
+
+		if counter.NextAndWrap() != false {
+			t.Errorf("Unexpected NextAndWrap result, expected false")
+		}
+
+		if counter.index != 1 {
+			t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, 1)
+		}
+
+		if counter.NextAndWrap() != true {
+			t.Errorf("Unexpected NextAndWrap result, expected true")
+		}
+
+		if counter.index != 0 {
+			t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, 0)
+		}
+	})
+
+	t.Run("GetHealthUrlCase", func(t *testing.T) {
+		server := Server{ServerConfig: config.ServerConfig{Url: "http://s1", Health: "/health"}}
+
+		if server.GetHealthUrl() != "http://s1/health" {
+			t.Errorf("Unexpected health check url: %s", server.GetHealthUrl())
+		}
+	})
 }
