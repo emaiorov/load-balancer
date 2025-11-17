@@ -45,12 +45,6 @@ func NewLeastConnectionsHandler(servers []Server) *LeastConnectionsHandler {
 	}
 }
 
-func (h *Handler) ResetLoadScore() {
-	for i := range h.Servers {
-		h.Servers[i].LoadScore = 0
-	}
-}
-
 func (h *Handler) DecrementScore(server *Server) {
 	h.mu.Lock()
 	defer h.mu.Unlock()

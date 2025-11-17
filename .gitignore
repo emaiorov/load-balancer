@@ -10,3 +10,4 @@
 # Ignore Mac and Windows system files
 .DS_Store
 Thumbs.db
+/load-balancer/coverage.out

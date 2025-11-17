@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"cmp"
 	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"slices"
 )
 
 type RoundRobinHandler struct {
@@ -19,11 +21,18 @@ func NewRoundRobinHandler(servers []Server) *RoundRobinHandler {
 		serversPtrs[i] = &servers[i]
 	}
 
-	return &RoundRobinHandler{
+	handler := &RoundRobinHandler{
 		Handler: Handler{
 			Servers: serversPtrs,
 		},
 	}
+
+	// Add initial sorting for servers accordingly
+	slices.SortFunc(handler.Servers, func(a, b *Server) int {
+		return cmp.Compare(b.Weight, a.Weight)
+	})
+
+	return handler
 }
 
 func (h *RoundRobinHandler) GetUrl() (string, error) {
