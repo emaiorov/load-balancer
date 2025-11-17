@@ -29,7 +29,7 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 		serverID = "Unknown server"
 	}
 
-	//log.Printf("[%s] Received request: %s %s", serverID, r.Method, r.URL.Path)
+	log.Printf("[%s] Received request: %s %s", serverID, r.Method, r.URL.Path)
 
 	sleepTime := time.Duration(rand.Intn(1000)+200) * time.Millisecond
 	time.Sleep(sleepTime)
@@ -40,5 +40,5 @@ func requestHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, `{"message": "Hello from %s", "duration_ms": %d}`,
 		serverID, sleepTime.Milliseconds())
 
-	log.Printf("[%s] Finished request (took %v)", serverID, sleepTime)
+	//log.Printf("[%s] Finished request (took %v)", serverID, sleepTime)
 }
