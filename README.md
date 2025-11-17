@@ -1,5 +1,7 @@
 # Go HTTP Load Balancer
 
+[![codecov](https://codecov.io/github/emaiorov/load-balancer/graph/badge.svg?token=6GLC4AILXX)](https://codecov.io/github/emaiorov/load-balancer)
+
 A simple, concurrent HTTP load balancer written in Go, built as a learning project.
 
 ## Features
