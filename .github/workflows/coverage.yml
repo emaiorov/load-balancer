@@ -19,7 +19,7 @@ jobs:
         go-version: '1.23'
 
     - name: Run tests with coverage
-      run: cd load-balancer/ && go test -race -coverprofile=coverage.out -covermode=atomic ./...
+      run: cd load-balancer/ && go test -race -coverprofile=coverage.out -covermode=atomic -tags=integration ./...
 
     - name: Upload coverage report to Codecov
       uses: codecov/codecov-action@v5
