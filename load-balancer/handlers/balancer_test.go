@@ -14,7 +14,7 @@ func TestLoad(t *testing.T) {
 		expectedServers []Server
 	}{
 		{
-			name: "Case with zero weight interpret as 1 test",
+			name: "CaseWithZeroWeightInterpretAsOneTest",
 			servers: []Server{
 				{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 0}},
 				{ServerConfig: config.ServerConfig{Url: "http://s2", Weight: 5}},
@@ -28,7 +28,7 @@ func TestLoad(t *testing.T) {
 			},
 		},
 		{
-			name: "Case with all zero weights",
+			name: "CaseWithAllZeroWeights",
 			servers: []Server{
 				{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 0}},
 				{ServerConfig: config.ServerConfig{Url: "http://s2", Weight: 0}},
@@ -42,7 +42,7 @@ func TestLoad(t *testing.T) {
 			},
 		},
 		{
-			name: "Case with high difference weights",
+			name: "CaseWithHighDifferenceWeights",
 			servers: []Server{
 				{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 5}},
 				{ServerConfig: config.ServerConfig{Url: "http://s2", Weight: 50000}},
@@ -58,7 +58,7 @@ func TestLoad(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		t.Run("NewLeastConnectionsHandlerSuccess", func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			lcHandler := NewLeastConnectionsHandler(tc.servers)
 
 			if lcHandler.LCM != tc.expectedLCM {
@@ -71,31 +71,28 @@ func TestLoad(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestDecrementScore(t *testing.T) {
 	testCasesDecrementScore := []struct {
 		name              string
 		server            Server
 		expectedLoadScore uint
 	}{
 		{
-			name:              "Load score deduction logic",
+			name:              "LoadScoreDeductionLogicOne",
 			server:            Server{LoadScore: 5, LoadCost: 1},
 			expectedLoadScore: 4,
 		},
 		{
-			name:              "Load score deduction logic",
-			server:            Server{LoadScore: 25, LoadCost: 5},
-			expectedLoadScore: 20,
-		},
-		{
-			name:              "Load score deduction logic",
+			name:              "LoadScoreDeductionLogicFive",
 			server:            Server{LoadScore: 25, LoadCost: 5},
 			expectedLoadScore: 20,
 		},
 	}
 
 	for _, tc := range testCasesDecrementScore {
-		t.Run("DecrementScore", func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			var h Handler
 			h.DecrementScore(&tc.server)
 
@@ -104,14 +101,16 @@ func TestLoad(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestGetServer(t *testing.T) {
 	testCasesGetServer := []struct {
 		name           string
 		servers        []Server
 		expectedServer Server
 	}{
 		{
-			name: "Case with same weights",
+			name: "CaseWithSameWeights",
 			servers: []Server{
 				{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 1}, IsAlive: true, LoadScore: 4, LoadCost: 1},
 				{ServerConfig: config.ServerConfig{Url: "http://s2", Weight: 1}, IsAlive: true, LoadScore: 4, LoadCost: 1},
@@ -122,7 +121,7 @@ func TestLoad(t *testing.T) {
 			},
 		},
 		{
-			name: "Case with high difference weights",
+			name: "CaseWithHighDifferenceWeights",
 			servers: []Server{
 				{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 5}, IsAlive: true, LoadScore: 40, LoadCost: 20},
 				{ServerConfig: config.ServerConfig{Url: "http://s2", Weight: 50}, IsAlive: true, LoadScore: 2, LoadCost: 2},
@@ -133,7 +132,7 @@ func TestLoad(t *testing.T) {
 			},
 		},
 		{
-			name: "Case with one alive server",
+			name: "CaseWithOneAliveServer",
 			servers: []Server{
 				{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 0}, IsAlive: false},
 				{ServerConfig: config.ServerConfig{Url: "http://s2", Weight: 5}, IsAlive: true},
@@ -146,7 +145,7 @@ func TestLoad(t *testing.T) {
 	}
 
 	for _, tc := range testCasesGetServer {
-		t.Run("GetServerCalculatesProperServer", func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			serversClone := make([]Server, len(tc.servers))
 			for i := range tc.servers {
 				newServer := tc.servers[i]
@@ -171,7 +170,9 @@ func TestLoad(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestGetServerReturnsErrorWhenNoServersConfigured(t *testing.T) {
 	t.Run("GetServerReturnsErrorWhenNoServersConfigured", func(t *testing.T) {
 		serversClone := make([]Server, 0)
 
@@ -182,7 +183,9 @@ func TestLoad(t *testing.T) {
 			t.Errorf("Expected error that no servers found")
 		}
 	})
+}
 
+func TestGetServerReturnsErrorWhenAllServersDead(t *testing.T) {
 	t.Run("GetServerReturnsErrorWhenAllServersDead", func(t *testing.T) {
 		servers := []Server{
 			{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 0}, IsAlive: false},
@@ -197,14 +200,15 @@ func TestLoad(t *testing.T) {
 			t.Errorf("Expected error that no servers found")
 		}
 	})
-
+}
+func TestCasesRoundRobin(t *testing.T) {
 	testCasesRoundRobin := []struct {
 		name        string
 		servers     []Server
 		extectedUrl string
 	}{
 		{
-			name: "Case with max weight taken as first url",
+			name: "RoundRobinCaseWithMaxWeightTakenAsFirstUrl",
 			servers: []Server{
 				{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 5}, IsAlive: true},
 				{ServerConfig: config.ServerConfig{Url: "http://s2", Weight: 1}, IsAlive: true},
@@ -213,7 +217,7 @@ func TestLoad(t *testing.T) {
 			extectedUrl: "http://s3",
 		},
 		{
-			name: "Case with all zero weights results in first url taken",
+			name: "RoundRobinCaseWithAllZeroWeightsResultsInFirstUrlTaken",
 			servers: []Server{
 				{ServerConfig: config.ServerConfig{Url: "http://s1", Weight: 0}, IsAlive: true},
 				{ServerConfig: config.ServerConfig{Url: "http://s2", Weight: 0}, IsAlive: true},
@@ -224,7 +228,7 @@ func TestLoad(t *testing.T) {
 	}
 
 	for _, tc := range testCasesRoundRobin {
-		t.Run("RoundRobinGetUrlHandlerSuccess", func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			rrHandler := NewRoundRobinHandler(tc.servers)
 
 			url, err := rrHandler.GetUrl()
@@ -238,10 +242,12 @@ func TestLoad(t *testing.T) {
 			}
 		})
 	}
+}
+func TestCasesRoundRobinCounter(t *testing.T) {
 
 	testCasesCounter := []int{1, 5, 0, 50000000}
 	for _, tc := range testCasesCounter {
-		t.Run("SetLenth", func(t *testing.T) {
+		t.Run("RoundRobinSetLenth", func(t *testing.T) {
 			counter := Counter{0, 0}
 			counter.SetLenth(tc)
 
@@ -250,10 +256,13 @@ func TestLoad(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCasesRoundRobinNextCounter(t *testing.T) {
 
 	testCasesNextCounter := []int{3, 5, 7, 50000000}
 	for _, tc := range testCasesNextCounter {
-		t.Run("NextCounter", func(t *testing.T) {
+		t.Run("RoundRobinNextCounter", func(t *testing.T) {
 			counter := Counter{0, 0}
 			counter.SetLenth(tc)
 			counter.Next()
@@ -267,8 +276,9 @@ func TestLoad(t *testing.T) {
 			}
 		})
 	}
-
-	t.Run("NextCounterEdgeCases", func(t *testing.T) {
+}
+func TestCasesRoundRobinNextCounterEdgeCases(t *testing.T) {
+	t.Run("RoundRobinNextCounterEdgeCases", func(t *testing.T) {
 		counter := Counter{0, 0}
 		counter.SetLenth(0)
 		counter.Next()
@@ -293,8 +303,10 @@ func TestLoad(t *testing.T) {
 			t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, 1)
 		}
 	})
+}
 
-	t.Run("NextAndWrapCounter", func(t *testing.T) {
+func TestCasesRoundRobinNextAndWrapCounter(t *testing.T) {
+	t.Run("RoundRobinNextAndWrapCounter", func(t *testing.T) {
 		counter := Counter{0, 0}
 		counter.SetLenth(2)
 
@@ -314,7 +326,9 @@ func TestLoad(t *testing.T) {
 			t.Errorf("Unexpected counter index: %d expected index: %d", counter.index, 0)
 		}
 	})
+}
 
+func TestCasesGetHealthUrlCase(t *testing.T) {
 	t.Run("GetHealthUrlCase", func(t *testing.T) {
 		server := Server{ServerConfig: config.ServerConfig{Url: "http://s1", Health: "/health"}}
 
